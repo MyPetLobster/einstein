@@ -30,7 +30,7 @@ def main():
     user_name, customize = greet_user()
 
     if customize == 'y' or customize == 'yes':
-        model, temperature, user_instructions, system_message = customize_chatbot()
+        model, temperature, system_message, user_instructions = customize_chatbot()
 
     
 
@@ -50,7 +50,7 @@ def greet_user():
     rich_print(intro_table)
 
     user_name = console.input("What should I call you? ")
-    customize = console.input("[italic]Do you want to customize the model, temperature, or system instructions? (y/n) [/italic]").lower().strip()
+    customize = console.input("[italic]Do you want to customize the model, temperature, or system instructions? (y/n) [/italic]").strip().lower()
 
     rich_print("\n[italic]Type [encircle red]'quit'[/encircle red] to exit the program at any time.[italic/]")
 
@@ -60,39 +60,37 @@ def greet_user():
 def customize_chatbot():
     """
     If the user chooses to customize the chatbot, this function will run.
-
-    No Args
-
-    Returns: Tuple containing {model, temperature, instructions, system_message}
     """
-    rich_print("\n[bold]Customize Einstein[/]")
-    rich_print("\n[italic]If you want to use the default settings, just press [green bold]'Enter'[/green bold][/italic]/n")
-    rich_print("\n[italic]Default settings: Model: gpt-4, Temperature: 0.8, System Message: Default[/italic]/n")
-    rich_print("\n[italic]If you want more info about any option below, type [green bold]'help'[/green bold][/italic]/n/n")
+    while True:
+        rich_print("\n[bold]Customize Einstein[/]")
+        rich_print("\n[italic]If you want to use the default settings, just press [green bold]'Enter'[/green bold][/italic]/n")
+        rich_print("\n[italic]Default settings: Model: gpt-4, Temperature: 0.8, System Message: Default[/italic]/n")
+        rich_print("\n[italic]If you want more info about any option below, type [green bold]'help'[/green bold][/italic]/n/n")
 
-    model = console.input("Which [bold]model[/] would you like to use? [italic](gpt-3.5-turbo, gpt-4, gpt-4-turbo-preview)[/]/n")
-    if model == "help":
-        return help_options()
-    temperature = round(float(console.input("What [bold]temperature[/] would you like to use? [italic](0.0 - 2.0)[/] "), 1))
-    if temperature == "help":
-        return help_options()
-    user_instructions = console.input("What [bold]instructions[/] would you like to provide to the AI? [italic][/] ")
-    if user_instructions == "help":
-        return help_options()
-    system_message = console.input("What [bold]system message[/] would you like to use? [italic](default, academic_advisor, math_tutor)[/] ")
-    if system_message == "help":
-        return help_options()
+        model = get_input_with_help("Which [bold]model[/] would you like to use? [italic](gpt-3.5-turbo, gpt-4, gpt-4-turbo-preview)[/] ")
+        temperature = get_input_with_help("What [bold]temperature[/] would you like to use? [italic](0.0 - 2.0)[/] ")
+        user_instructions = get_input_with_help("What [bold]instructions[/] would you like to provide to the AI? [italic][/] ")
+        system_message = get_input_with_help("What [bold]system message[/] would you like to use? [italic](default, academic_advisor, math_tutor)[/] ")
 
-    return model, temperature, user_instructions, system_message
+        if confirm_customization(model, temperature, user_instructions, system_message):
+            return model, round(float(temperature), 1), system_message, user_instructions
+
+
+def get_input_with_help(prompt):
+    """
+    Get user input with help option.
+    """
+    while True:
+        user_input = console.input(prompt)
+        if user_input.lower() == "help":
+            help_options()
+        else:
+            return user_input
 
 
 def help_options():
     """
     If the user types "help" at any time, this function will run.
-
-    No Args
-
-    Returns: None
     """
     help_table = Table(box=box.SQUARE_DOUBLE_HEAD)
     help_table.add_column("Help Options", header_style="bold cyan", justify="center")
@@ -102,7 +100,20 @@ def help_options():
     help_table.add_row("[bold]System Message[/]: The system message to provide to the AI. The default is 'default', a general assistant.")
     rich_print(help_table)
 
-    return customize_chatbot()
+
+def confirm_customization(model, temperature, user_instructions, system_message):
+    """
+    Confirm customization options with the user.
+    """
+    rich_print("\n[bold]Customization Summary[/]")
+    rich_print(f"\n[bold]Model[/]: {model}")
+    rich_print(f"\n[bold]Temperature[/]: {temperature}")
+    rich_print(f"\n[bold]Instructions[/]: {user_instructions}")
+    rich_print(f"\n[bold]System Message[/]: {system_message}")
+    confirmation = console.input("\n[bold light_cyan1]Are these customization options correct? ([green]y[/green]/[red]n[/red])[/] ").strip().lower()
+    return confirmation == 'y' or confirmation == 'yes'
+
+
     
 # Function to initialize conversation and provide system message to the AI
 def initialize_conversation(user_name, user_instructions, system_message):
