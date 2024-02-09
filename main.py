@@ -8,26 +8,33 @@ from rich.console import Console
 from rich import box
 from rich.table import Table
 
+# "system_messages" is a list of dicts with the following keys: "default", "academic_advisor", "math_tutor"
+from instructions import system_messages
+
 load_dotenv()
 client = OpenAI()
 console = Console()
 
-# Set default model and temperature
+# Default Settings
 MODEL = "gpt-4"
 TEMPERATURE = 0.8
+SYSTEM_MESSAGE = system_messages["default"]
 
 
 def main():
     model = MODEL
     temperature = TEMPERATURE
+    system_message = SYSTEM_MESSAGE
     user_instructions = ""
 
     user_name, customize = greet_user()
 
     if customize == 'y' or customize == 'yes':
-        model, temperature, user_instructions = customize_chatbot()
+        model, temperature, user_instructions, system_message = customize_chatbot()
 
-    conversation = initialize_conversation(user_name, user_instructions)
+    
+
+    conversation = initialize_conversation(user_name, user_instructions, system_message)
     have_conversation(conversation, user_name, model, temperature)
 
 
@@ -56,13 +63,23 @@ def customize_chatbot():
 
     No Args
 
-    Returns: Tuple containing {model, temperature, instructions}
+    Returns: Tuple containing {model, temperature, instructions, system_message}
     """
-    ...
+    rich_print("\n[bold]Customize Einstein[/]")
+    rich_print("\n[italic]If you want to use the default settings, just press [green bold]'Enter'[/green bold][/italic]/n")
+    rich_print("\n[italic]Default settings: Model: gpt-4, Temperature: 0.8, System Message: Default[/italic]/n")
+    rich_print("\n[italic]If you want more info about any option below, type [green bold]'help'[/green bold][/italic]/n/n")
+
+    model = console.input("Which [bold]model[/] would you like to use? [italic](gpt-3.5-turbo, gpt-4, gpt-4-turbo-preview)[/]/n")
+    temperature = round(float(console.input("What [bold]temperature[/] would you like to use? [italic](0.0 - 2.0)[/] "), 1))
+    user_instructions = console.input("What [bold]instructions[/] would you like to provide to the AI? [italic][/] ")
+    system_message = console.input("What [bold]system message[/] would you like to use? [italic](default, academic_advisor, math_tutor)[/] ")
+    
+    return model, temperature, user_instructions, system_message
 
     
 # Function to initialize conversation and provide system message to the AI
-def initialize_conversation(user_name, user_instructions):
+def initialize_conversation(user_name, user_instructions, system_message):
     """
     Initializes the conversation.
 
@@ -75,7 +92,13 @@ def initialize_conversation(user_name, user_instructions):
     """
     return [  
         {   
-            'role':'system', 'content':f'''... '''
+            'role':'system', 'content':f'''{system_message}/n
+            
+            The name of the person you are talking to is {user_name}./n
+            If there is any additional context or instructions for you to follow, they will follow this sentence./n
+            
+            {user_instructions}
+            '''
         },
     ]
 

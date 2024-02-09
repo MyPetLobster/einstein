@@ -2,15 +2,17 @@
 
 """
 
+baseline_prompt = """"""
+
 system_messages = [
     {
-        "default": """"""
+        "default": f""""""
     },
     {
-        "academic_advisor": """"""
+        "academic_advisor": f""""""
     },
     {
-        "math_tutor": """"""
+        "math_tutor": f""""""
     }
 
 ]
