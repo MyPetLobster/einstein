@@ -12,9 +12,10 @@ load_dotenv()
 client = OpenAI()
 console = Console()
 
-# set the model used for the conversation
+# Set default model and temperature
 MODEL = "gpt-4"
 TEMPERATURE = 0.8
+
 
 def main():
     model = MODEL
