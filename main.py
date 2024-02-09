@@ -153,6 +153,7 @@ def get_completion_from_messages(messages, model, temperature):
 def create_conversation_file(user_name):
     """
     Create a file to store the conversation.
+
     Args: 
         user_name (str): The name of the user.
 
@@ -160,20 +161,16 @@ def create_conversation_file(user_name):
         str: The filename of the conversation file.
     """
 
-    # Create the "conversations" folder if it doesn't exist
     if not os.path.exists("conversations"):
         os.makedirs("conversations")
 
-    # Generate a timestamp to use in the filename
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M")
-
-    # Get a list of all existing files in conversation directory
     existing_files = [f for f in os.listdir("conversations")]
 
     # Check if user wants to customize file name 
     customize_name = console.input("\n[bold light_cyan1]Do you want to customize the conversation file name? ([green]y[/green]/[red]n[/red])[/] ").strip().lower()
 
-    # Custom file name logic
+    # Custom file naming logic
     if customize_name == 'y' or customize_name == 'yes':
         while True:
             filename = console.input("\n[bold light_cyan1]Enter a custom file name: [/]")
@@ -182,21 +179,17 @@ def create_conversation_file(user_name):
             else:
                 break
 
-    # Default file name logic
+    # Default file naming logic
     else:
-        existing_default_files = [f for f in existing_files if f.startswith(f"{user_name}")]
-
-        if existing_default_files:
-            # Find the highest conversation count and increment by 1
-            highest_count = max([int(f.split("_")[-1].split(".")[0]) for f in existing_files])
-            conversation_count = highest_count + 1
-        else:
-            conversation_count = 1
+        # Find the highest conversation count and increment by 1
+        highest_count = max([int(f.split("_")[-1].split(".")[0]) for f in existing_files if f.startswith(f"{user_name}_")], default=0)
+        conversation_count = highest_count + 1
 
         # Construct the filename
         filename = f"{user_name}_{timestamp}_{conversation_count:03d}.txt"
 
     return filename
+
 
 
 def have_conversation(conversation, user_name, model, temperature):
