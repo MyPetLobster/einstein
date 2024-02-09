@@ -16,7 +16,7 @@ client = OpenAI()
 console = Console()
 
 # Default Settings
-MODEL = "gpt-4"
+MODEL = "gpt-3.5-turbo"
 TEMPERATURE = 0.8
 SYSTEM_MESSAGE = system_messages["default"]
 
@@ -50,7 +50,7 @@ def greet_user():
     rich_print(intro_table)
 
     user_name = console.input("What should I call you? ")
-    customize = console.input("[italic]Do you want to customize the model, temperature, or system instructions? (y/n) [/italic]").strip().lower()
+    customize = console.input("\n[italic]Do you want to customize the model, temperature, or system instructions? ([green]y[/green]/[red]n[/red])[/italic]").strip().lower()
 
     rich_print("\n[italic]Type [encircle red]'quit'[/encircle red] to exit the program at any time.[italic/]")
 
@@ -62,10 +62,12 @@ def customize_chatbot():
     If the user chooses to customize the chatbot, this function will run.
     """
     while True:
-        rich_print("\n[bold]Customize Einstein[/]")
-        rich_print("\n[italic]If you want to use the default settings, just press [green bold]'Enter'[/green bold][/italic]/n")
-        rich_print("\n[italic]Default settings: Model: gpt-4, Temperature: 0.8, System Message: Default[/italic]/n")
-        rich_print("\n[italic]If you want more info about any option below, type [green bold]'help'[/green bold][/italic]/n/n")
+        customize_table = Table(box=box.SQUARE_DOUBLE_HEAD)
+        customize_table.add_column("Customize Einstein", header_style="bold cyan", justify="center")
+        customize_table.add_row("\n[italic]If you want to use the default settings, just press [green bold]'Enter'[/green bold][/italic]\n")
+        customize_table.add_row("\n[italic]Default settings: Model: gpt-4, Temperature: 0.8, System Message: Default[/italic]\n")
+        customize_table.add_row("\n[italic]If you want more info about any option below, type [green bold]'help'[/green bold][/italic]\n")
+        rich_print(customize_table)
 
         model = get_input_with_help("Which [bold]model[/] would you like to use? [italic](gpt-3.5-turbo, gpt-4, gpt-4-turbo-preview)[/] ")
         temperature = get_input_with_help("What [bold]temperature[/] would you like to use? [italic](0.0 - 2.0)[/] ")
@@ -129,13 +131,13 @@ def initialize_conversation(user_name, system_message, user_instructions):
     """
     return [  
         {   
-            'role':'system', 'content':f'''Your primary instructions are below, delimited by three asterisks./n
+            'role':'system', 'content':f'''Your primary instructions are below, delimited by three asterisks.\n
             
-            ***{system_message}***/n
+            ***{system_message}***\n
             
-            The name of the person you are talking to is {user_name}./n
+            The name of the person you are talking to is {user_name}.\n
             If there is any additional context or instructions for you to follow, they will be entered below,
-            delimited by three backticks./n
+            delimited by three backticks.\n
             
             ```{user_instructions}```
             '''
@@ -175,6 +177,8 @@ def create_conversation_file(user_name):
     if customize_name == 'y' or customize_name == 'yes':
         while True:
             filename = console.input("\n[bold light_cyan1]Enter a custom file name: [/]")
+            if filename.split(".")[-1] != "txt":
+                filename += ".txt"
             if filename in existing_files:
                 rich_print("\n[bold red]That file already exists. Please enter a different name.[/]")
             else:
@@ -237,4 +241,3 @@ def have_conversation(conversation, user_name, model, temperature):
 
 if __name__ == "__main__":
     main()
-
