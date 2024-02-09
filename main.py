@@ -36,6 +36,8 @@ def main():
     have_conversation(conversation, user_name, model, temperature)
 
 
+
+
 def greet_user():
     intro_table = Table(box=box.SQUARE_DOUBLE_HEAD)
     intro_table.add_column("This is Einstein, your personal assistant.", header_style="bold cyan", justify="center")
@@ -141,12 +143,11 @@ def initialize_conversation(user_name, system_message, user_instructions):
     ]
 
 
-# Function to set completion parameters and get response for conversation
 def get_completion_from_messages(messages, model, temperature):
     '''Set model and temperature for conversation, send message to OpenAI and get response'''
     response = client.chat.completions.create(model=model,
-    messages=messages,
-    temperature=temperature)
+    messages = messages,
+    temperature = temperature)
     return response.choices[0].message.content
 
 
@@ -191,7 +192,6 @@ def create_conversation_file(user_name):
     return filename
 
 
-
 def have_conversation(conversation, user_name, model, temperature):
     """
     Facilitates the conversation between the user and the character.
@@ -231,6 +231,8 @@ def have_conversation(conversation, user_name, model, temperature):
 
     finally:
         conversation_file.close()
+
+
 
 
 if __name__ == "__main__":
