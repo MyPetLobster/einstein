@@ -71,12 +71,38 @@ def customize_chatbot():
     rich_print("\n[italic]If you want more info about any option below, type [green bold]'help'[/green bold][/italic]/n/n")
 
     model = console.input("Which [bold]model[/] would you like to use? [italic](gpt-3.5-turbo, gpt-4, gpt-4-turbo-preview)[/]/n")
+    if model == "help":
+        return help_options()
     temperature = round(float(console.input("What [bold]temperature[/] would you like to use? [italic](0.0 - 2.0)[/] "), 1))
+    if temperature == "help":
+        return help_options()
     user_instructions = console.input("What [bold]instructions[/] would you like to provide to the AI? [italic][/] ")
+    if user_instructions == "help":
+        return help_options()
     system_message = console.input("What [bold]system message[/] would you like to use? [italic](default, academic_advisor, math_tutor)[/] ")
-    
+    if system_message == "help":
+        return help_options()
+
     return model, temperature, user_instructions, system_message
 
+
+def help_options():
+    """
+    If the user types "help" at any time, this function will run.
+
+    No Args
+
+    Returns: None
+    """
+    help_table = Table(box=box.SQUARE_DOUBLE_HEAD)
+    help_table.add_column("Help Options", header_style="bold cyan", justify="center")
+    help_table.add_row("[bold]Model[/]: The model used to generate responses. The default is gpt-4.")
+    help_table.add_row("[bold]Temperature[/]: The randomness of the AI's responses. Higher temperatures will result in more random responses. The default is 0.8.")
+    help_table.add_row("[bold]Instructions[/]: Any additional context or instructions for the AI to follow.")
+    help_table.add_row("[bold]System Message[/]: The system message to provide to the AI. The default is 'default', a general assistant.")
+    rich_print(help_table)
+
+    return customize_chatbot()
     
 # Function to initialize conversation and provide system message to the AI
 def initialize_conversation(user_name, user_instructions, system_message):
@@ -88,7 +114,7 @@ def initialize_conversation(user_name, user_instructions, system_message):
         system_prompt (str): The custom prompt entered by user (OPTIONAL)
 
     Returns:
-        list: A list containing a system message with instructions for the character.
+        list: A list containing a system message with instructions for Einstein.
     """
     return [  
         {   
