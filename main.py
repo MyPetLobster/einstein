@@ -32,9 +32,7 @@ def main():
     if customize == 'y' or customize == 'yes':
         model, temperature, system_message, user_instructions = customize_chatbot()
 
-    
-
-    conversation = initialize_conversation(user_name, user_instructions, system_message)
+    conversation = initialize_conversation(user_name, system_message, user_instructions)
     have_conversation(conversation, user_name, model, temperature)
 
 
@@ -83,12 +81,12 @@ def get_input_with_help(prompt):
     while True:
         user_input = console.input(prompt)
         if user_input.lower() == "help":
-            help_options()
+            show_help()
         else:
             return user_input
 
 
-def help_options():
+def show_help():
     """
     If the user types "help" at any time, this function will run.
     """
@@ -114,9 +112,9 @@ def confirm_customization(model, temperature, user_instructions, system_message)
     return confirmation == 'y' or confirmation == 'yes'
 
 
-    
-# Function to initialize conversation and provide system message to the AI
-def initialize_conversation(user_name, user_instructions, system_message):
+
+
+def initialize_conversation(user_name, system_message, user_instructions):
     """
     Initializes the conversation.
 
@@ -129,12 +127,15 @@ def initialize_conversation(user_name, user_instructions, system_message):
     """
     return [  
         {   
-            'role':'system', 'content':f'''{system_message}/n
+            'role':'system', 'content':f'''Your primary instructions are below, delimited by three asterisks./n
+            
+            ***{system_message}***/n
             
             The name of the person you are talking to is {user_name}./n
-            If there is any additional context or instructions for you to follow, they will follow this sentence./n
+            If there is any additional context or instructions for you to follow, they will be entered below,
+            delimited by three backticks./n
             
-            {user_instructions}
+            ```{user_instructions}```
             '''
         },
     ]
@@ -149,7 +150,55 @@ def get_completion_from_messages(messages, model, temperature):
     return response.choices[0].message.content
 
 
-# Function to continue conversation
+def create_conversation_file(user_name):
+    """
+    Create a file to store the conversation.
+    Args: 
+        user_name (str): The name of the user.
+
+    Returns:
+        str: The filename of the conversation file.
+    """
+
+    # Create the "conversations" folder if it doesn't exist
+    if not os.path.exists("conversations"):
+        os.makedirs("conversations")
+
+    # Generate a timestamp to use in the filename
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M")
+
+    # Get a list of all existing files in conversation directory
+    existing_files = [f for f in os.listdir("conversations")]
+
+    # Check if user wants to customize file name 
+    customize_name = console.input("\n[bold light_cyan1]Do you want to customize the conversation file name? ([green]y[/green]/[red]n[/red])[/] ").strip().lower()
+
+    # Custom file name logic
+    if customize_name == 'y' or customize_name == 'yes':
+        while True:
+            filename = console.input("\n[bold light_cyan1]Enter a custom file name: [/]")
+            if filename in existing_files:
+                rich_print("\n[bold red]That file already exists. Please enter a different name.[/]")
+            else:
+                break
+
+    # Default file name logic
+    else:
+        existing_default_files = [f for f in existing_files if f.startswith(f"{user_name}")]
+
+        if existing_default_files:
+            # Find the highest conversation count and increment by 1
+            highest_count = max([int(f.split("_")[-1].split(".")[0]) for f in existing_files])
+            conversation_count = highest_count + 1
+        else:
+            conversation_count = 1
+
+        # Construct the filename
+        filename = f"{user_name}_{timestamp}_{conversation_count:03d}.txt"
+
+    return filename
+
+
 def have_conversation(conversation, user_name, model, temperature):
     """
     Facilitates the conversation between the user and the character.
@@ -161,28 +210,9 @@ def have_conversation(conversation, user_name, model, temperature):
     Returns:
         None
     """
-    # Create the "conversations" folder if it doesn't exist
-    if not os.path.exists("conversations"):
-        os.makedirs("conversations")
-
-    # Generate a timestamp to use in the filename
-    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M")
-
-    # Check for existing conversation files
-    existing_files = [f for f in os.listdir("conversations") if f.startswith(f"{user_name}_")]
-
-    if existing_files:
-        # Find the highest conversation count and increment by 1
-        highest_count = max([int(f.split("_")[-1].split(".")[0]) for f in existing_files])
-        conversation_count = highest_count + 1
-    else:
-        conversation_count = 1
-
-    # Construct the filename
-    filename = f"{user_name}_{timestamp}_{conversation_count:03d}.txt"
+    filename = create_conversation_file(user_name)
     conversation_file = open(os.path.join("conversations", filename), "w", encoding="utf-8")
 
-    # Have the conversation
     try:
         while True:
             user_input = console.input("\n[bold light_cyan1]You: [/]")
