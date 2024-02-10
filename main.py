@@ -28,14 +28,40 @@ def main():
     user_instructions = ""
 
     user_name, customize = greet_user()
-
     if customize == 'y' or customize == 'yes':
         model, temperature, system_message, user_instructions = customize_chatbot()
 
-    conversation = initialize_conversation(user_name, system_message, user_instructions)
+    resume = console.input("\n[bold]Are you resuming an existing conversation? ([green]y[/green]/[red]n[/red])[/]")
+    if resume == 'y' or resume == 'yes':
+        model, temperature, system_message, user_instructions = customize_chatbot()
+        conversation = fetch_conversation()
+    else:
+        conversation = initialize_conversation(user_name, system_message, user_instructions)
+
     have_conversation(conversation, user_name, model, temperature)
 
 
+
+
+def fetch_conversation():
+    context_list = [f for f in os.listdir("context")]
+    if len(context_list) == 0:
+        rich_print("\n[bold red]There are no existing conversations to resume.[/]")
+        exit()
+    rich_print("\n[bold light_cyan1]Choose a conversation to resume:[/]")
+    for i, f in enumerate(context_list):
+        rich_print(f"[bold]{i + 1}.[/] {f}")
+    while True:
+        try:
+            choice = int(console.input("\n[bold light_cyan1]Enter the number of the conversation you want to resume: [/]"))
+            if choice < 1 or choice > len(context_list):
+                raise ValueError
+            break
+        except ValueError:
+            rich_print("\n[bold red]Please enter a valid number.[/]")
+    with open(os.path.join("context", context_list[choice - 1]), "r", encoding="utf-8") as f:
+        conversation = f.read() 
+    return conversation
 
 
 def greet_user():
@@ -65,7 +91,7 @@ def customize_chatbot():
         customize_table = Table(box=box.SQUARE_DOUBLE_HEAD)
         customize_table.add_column("Customize Einstein", header_style="bold cyan", justify="center")
         customize_table.add_row("\n[italic]If you want to use the default settings, just press [green bold]'Enter'[/green bold][/italic]\n")
-        customize_table.add_row("\n[italic]Default settings: Model: gpt-4, Temperature: 0.8, System Message: Default[/italic]\n")
+        customize_table.add_row("\n[italic]Default settings: Model: gpt-3.5-turbo, Temperature: 0.8, System Message: Default[/italic]\n")
         customize_table.add_row("\n[italic]If you want more info about any option below, type [green bold]'help'[/green bold][/italic]\n")
         rich_print(customize_table)
 
@@ -96,7 +122,7 @@ def show_help():
     """
     help_table = Table(box=box.SQUARE_DOUBLE_HEAD)
     help_table.add_column("Help Options", header_style="bold cyan", justify="center")
-    help_table.add_row("[bold]Model[/]: The model used to generate responses. The default is gpt-4.")
+    help_table.add_row("[bold]Model[/]: The model used to generate responses. The default is gpt-3.5-turbo.")
     help_table.add_row("[bold]Temperature[/]: The randomness of the AI's responses. Higher temperatures will result in more random responses. The default is 0.8.")
     help_table.add_row("[bold]Instructions[/]: Any additional context or instructions for the AI to follow.")
     help_table.add_row("[bold]System Message[/]: The system message to provide to the AI. The default is 'default', a general assistant.")
@@ -163,6 +189,8 @@ def create_conversation_file(user_name):
     Returns:
         str: The filename of the conversation file.
     """
+    if not os.path.exists("context"):
+        os.makedirs("context")
 
     if not os.path.exists("conversations"):
         os.makedirs("conversations")
@@ -196,6 +224,7 @@ def create_conversation_file(user_name):
     return filename
 
 
+
 def have_conversation(conversation, user_name, model, temperature):
     """
     Facilitates the conversation between the user and the character.
@@ -208,18 +237,25 @@ def have_conversation(conversation, user_name, model, temperature):
         None
     """
     filename = create_conversation_file(user_name)
+    context_filename = filename.replace(".txt", "_context.txt")
     conversation_file = open(os.path.join("conversations", filename), "w", encoding="utf-8")
+    context_file = open(os.path.join("context", context_filename), "w", encoding="utf-8")
+
+    # Write the initial system message to the context file
+    context_file.write(f'{{role: "system", content: "{conversation[0]["content"]}"}}\n')
 
     try:
         while True:
             user_input = console.input("\n[bold light_cyan1]You: [/]")
             conversation_file.write(f"You: {user_input}\n\n")
+            context_file.write(f'{{role: "user", content: "{user_input}"}}\n')
             if user_input.lower() == 'quit':
                 rich_print("\n[bold]Do you want to save this conversation? ([green]y[/green]/[red]n[/red])[/]")
                 save = console.input("\n[bold light_cyan1]You: ")
                 if save.lower() == 'n':
                     conversation_file.close()
                     os.remove(os.path.join("conversations", filename))
+                    os.remove(os.path.join("context", context_filename))
                     rich_print("\n[bold cyan]Goodbye![/]\n")
                     exit()
                 else:
@@ -232,9 +268,11 @@ def have_conversation(conversation, user_name, model, temperature):
 
             rich_print(f"\n[bold light_yellow3]Einstein: [/]", response)
             conversation_file.write(f"Einstein: {response}\n\n")
+            context_file.write(f'{{role: "assistant", content: "{response}"}}\n')
 
     finally:
         conversation_file.close()
+        context_file.close()
 
 
 

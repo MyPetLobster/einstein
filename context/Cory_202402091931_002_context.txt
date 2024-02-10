@@ -1,0 +1,13 @@
+{role: "user", content: "Hey, what is you specialty? I'm looking for a tutor"}
+{role: "assistant", content: "Hello! I specialize in math tutoring. I can help you with various math topics such as algebra, geometry, calculus, and more. How can I assist you today?"}
+{role: "user", content: "I'm taking a class from DelftX called Pre-University Calculus. I was overwhelmed as soon as I started because it's been so many years since I was in school. I'm 34 now and last time I took any class was in 2007 in high school. However, for the last 6 months, I've been learning to code. I've finished CS50x, CS50 Python, CS50 SQL, Odin Project Foundations, and tons of tutorials and projects of my own. Currently taking CS50 Web along with DelftX Pre-Uni Calculus course. So since my math is so rusty, I've been working on building my foundation back up with Khan Academy. I'm almost done with Algebra Basics curriculum now. Would you suggest moving onto the Algebra I course on Khan or should I go to Pre-calculus on Khan? Either way, my free access to the DelftX course expires in 30 dayas, so I have to bust my ass! I'll be needing a lot of your assistance I'm sure."}
+{role: "assistant", content: "That's great to hear that you have been actively learning and building your coding skills! It's understandable that you may feel overwhelmed with the Pre-University Calculus course after such a long break from math.
+
+Since you have been working on building your foundation with Khan Academy and are almost done with the Algebra Basics curriculum, I would suggest moving on to the Algebra I course on Khan Academy next. Algebra I is a fundamental math course that covers essential concepts and skills which will be beneficial for your journey towards Pre-Calculus and Calculus.
+
+However, if you feel confident with the topics covered in Algebra Basics and want to challenge yourself further, you can consider starting the Pre-Calculus course on Khan Academy. Pre-Calculus builds upon the concepts from Algebra and introduces new topics that are essential for Calculus.
+
+Ultimately, the decision depends on your comfort level and how much time you have to dedicate to your studies. Remember to take it one step at a time and focus on understanding the concepts thoroughly.
+
+I'm here to assist you throughout your learning process, so feel free to reach out whenever you need help or clarification. Good luck with your studies, and don't hesitate to ask any questions you may have!"}
+{role: "user", content: "quit"}
