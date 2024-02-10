@@ -33,7 +33,6 @@ def main():
 
     resume = console.input("\n[bold]Are you resuming an existing conversation? ([green]y[/green]/[red]n[/red])[/]")
     if resume == 'y' or resume == 'yes':
-        model, temperature, system_message, user_instructions = customize_chatbot()
         conversation = fetch_conversation()
     else:
         conversation = initialize_conversation(user_name, system_message, user_instructions)
@@ -61,6 +60,15 @@ def fetch_conversation():
             rich_print("\n[bold red]Please enter a valid number.[/]")
     with open(os.path.join("context", context_list[choice - 1]), "r", encoding="utf-8") as f:
         conversation = f.read() 
+
+    # Convert the conversation to a list of dicts
+    conversation = conversation.split("} ")
+    conversation = [f + "}," for f in conversation]
+    # Remove the last comma from the last message
+    conversation[-1] = conversation[-1][:-1]
+
+    print(conversation)
+
     return conversation
 
 
