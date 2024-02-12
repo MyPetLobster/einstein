@@ -8,7 +8,7 @@ from rich.console import Console
 from rich import box
 from rich.table import Table
 
-# "system_messages" is a list of dicts with the following keys: "default", "academic_advisor", "math_tutor"
+# "system_messages" is a list of dicts with the following keys: "default", "academic_advisor", "math_tutor", "script_writer"
 from instructions import system_messages
 
 load_dotenv()
@@ -106,7 +106,7 @@ def customize_chatbot():
         model = get_input_with_help("Which [bold]model[/] would you like to use? [italic](gpt-3.5-turbo, gpt-4, gpt-4-turbo-preview)[/] ")
         temperature = get_input_with_help("What [bold]temperature[/] would you like to use? [italic](0.0 - 2.0)[/] ")
         user_instructions = get_input_with_help("What [bold]instructions[/] would you like to provide to the AI? [italic][/] ")
-        system_message = get_input_with_help("What [bold]system message[/] would you like to use? [italic](default, academic_advisor, math_tutor)[/] ")
+        system_message = get_input_with_help("What [bold]system message[/] would you like to use? [italic](default, academic_advisor, math_tutor, script_writer)[/] ")
 
         if confirm_customization(model, temperature, user_instructions, system_message):
             return model, round(float(temperature), 1), system_message, user_instructions
